@@ -1,0 +1,218 @@
+{
+  "name": "mysql_instance_restart_incident",
+  "description": "This incident type refers to the restart of a MySQL instance that has caused an alert to trigger. It may be related to issues with the MySQL database or the server hosting the instance. The incident requires investigation and resolution to ensure the proper functioning of the affected services.",
+  "params": [
+    {
+      "name": "SERVICE_NAME",
+      "value": ""
+    },
+    {
+      "name": "PATH_TO_MYSQL_CONFIG_FILE",
+      "value": ""
+    },
+    {
+      "name": "PATH_TO_MYSQL_LOG_FILE",
+      "value": ""
+    },
+    {
+      "name": "OLD_VALUE",
+      "value": ""
+    },
+    {
+      "name": "SERVER_IP_ADDRESS",
+      "value": ""
+    },
+    {
+      "name": "MAX_CONNECTIONS",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## MySQL instance restart incident\nThis incident type refers to the restart of a MySQL instance that has caused an alert to trigger. It may be related to issues with the MySQL database or the server hosting the instance. The incident requires investigation and resolution to ensure the proper functioning of the affected services."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check MySQL service status"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `systemctl status mysql`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check MySQL logs for any errors"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `tail -n 100 /var/log/mysql/error.log`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the uptime of the server to see if there were any recent reboots"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `uptime`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if there are any resource constraints that could have caused the restart"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `top`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the MySQL configuration file for any issues"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `cat /etc/mysql/my.cnf`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the system logs for any other errors or warnings"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `dmesg | tail -n 50`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the disk usage to see if there are any disk space issues"
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `df -h`"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the network connectivity to the server"
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `ping ${SERVER_IP_ADDRESS}`"
+    },
+    {
+      "name": "cell_18",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if there are any other services running on the same machine that could have caused the restart"
+    },
+    {
+      "name": "cell_19",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `ps aux | grep -i ${SERVICE_NAME}`"
+    },
+    {
+      "name": "cell_20",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Set the log file path"
+    },
+    {
+      "name": "cell_21",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `LOG_FILE=${PATH_TO_MYSQL_LOG_FILE}`"
+    },
+    {
+      "name": "cell_22",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if the log file exists"
+    },
+    {
+      "name": "cell_23",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_check_log_file_exists()"
+    },
+    {
+      "name": "cell_24",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Search the log file for errors"
+    },
+    {
+      "name": "cell_25",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `ERRORS=$(grep -i \"error\" \"$LOG_FILE\")`"
+    },
+    {
+      "name": "cell_26",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if there are any errors"
+    },
+    {
+      "name": "cell_27",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_error_check()"
+    },
+    {
+      "name": "cell_28",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Review the configuration settings of the MySQL instance to ensure that they are not causing the restart."
+    },
+    {
+      "name": "cell_29",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_mysql_config_update($PATH_TO_MYSQL_CONFIG_FILE, $OLD_VALUE, $MAX_CONNECTIONS)"
+    }
+  ]
+}
